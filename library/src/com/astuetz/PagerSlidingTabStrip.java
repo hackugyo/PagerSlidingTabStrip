@@ -253,6 +253,22 @@ public class PagerSlidingTabStrip extends HorizontalScrollView {
 		});
 
 		tab.setPadding(tabPadding, 0, tabPadding, 0);
+		if (tabCount <= 4) {
+			tab.getViewTeeObserver().addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
+				@SuppressWarnings("deprecation")
+				@SuppressLint("NewApi")
+				@Override
+				public void onGlobalLayout() {
+					if (self.getWidth() == 0) return; // これを挟まないと0のときに暴発してしまう
+					if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
+						getViewTreeObserver().removeGlobalOnLayoutListener(this);
+					} else {
+						getViewTreeObserver().removeOnGlobalLayoutListener(this);
+					}
+					tab.getLayoutParams().width = self.getWidth() / tabCount;
+				}
+			});
+		}
 		tabsContainer.addView(tab, position, shouldExpand ? expandedTabLayoutParams : defaultTabLayoutParams);
 	}
 
